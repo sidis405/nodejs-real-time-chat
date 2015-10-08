@@ -27,7 +27,7 @@ module.exports = function(passport, FacebookStrategy, config, mongoose){
 
     }, function(accessToken, refreshToken, profile, done){
 
-        userModel.findOne({'profileId':profile.id}, function(err, result){
+        userModel.findOne({'profileID':profile.id}, function(err, result){
             if(result){
                 done(null, result)
             } else {
