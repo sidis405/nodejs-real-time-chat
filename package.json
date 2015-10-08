@@ -1,0 +1,22 @@
+{
+  "name": "chatcat",
+  "version": "0.0.1",
+  "description": "Chatcat App",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sidrit Trandafili",
+  "license": "ISC",
+  "homepage": "https://github.com/timmonsryan/ChatCat",
+  "dependencies": {
+    "connect-mongo": "^0.4.1",
+    "cookie-parser": "^1.1.0",
+    "express": "^4.2.0",
+    "express-session": "^1.2.0",
+    "hogan-express": "^0.5.2",
+    "mongoose": "^4.1.10",
+    "passport": "^0.2.0",
+    "passport-facebook": "^1.0.3"
+  }
+}

@@ -1,0 +1,9 @@
+{
+    "dbUrl" : "mongodb://sid:sapiens@ds049150.mongolab.com:49150/chatcat",
+    "sessionSecret" : "poiuytrewq",
+    "fb": {
+        "appID" : "183764235296371",
+        "appSecret" : "2534c2ef2d83184ed3753ee3e067a62f",
+        "callbackURL" : "http://192.168.1.131:9000/auth/facebook/callback"
+    }
+}
