@@ -4,7 +4,6 @@
 	<meta charset="UTF-8">
 	<title>{{title}}</title>
 	<link rel="stylesheet" href="../css/chatroom.css">
-	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	
 </head>
 <body>
@@ -20,11 +19,55 @@
 		</div>
 		<div class="cr-roomlist">
 			<ul class="roomlist">
-				<a href="#"><li>NodeJS</li></a>
+				<!-- <a href="#"><li>NodeJS</li></a>
 				<a href="#"><li>Cloud Computing</li></a>
-				<a href="#"><li>MongoDB</li></a>
+				<a href="#"><li>MongoDB</li></a> -->
 			</ul>
 		</div>
 	</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script>
+	$(function(){
+
+		var host = '{{config.host}}';
+
+		var socket = io.connect(host + '/roomlist');
+
+		socket.on('connect', function(){
+			console.log('connection estabilished');
+		});
+
+		socket.on('roomupdate', function(data){
+
+			var rooms = JSON.parse(data);
+
+			var room_count = rooms.length;
+
+			$('.roomlist').html('');
+			
+			for($i = 0; $i < room_count; $i++)
+			{
+				var str = '<a href="/room/' + rooms[$i].room_number + '"><li>' + rooms[$i].room_name + '</li></a>';
+				$('.roomlist').prepend(str);
+			}
+
+		});
+
+		$(document).on('click', '#create', function(){
+
+			var room_name = $('.newRoom').val();
+
+			if(room_name != '')
+			{	
+				room_number = parseInt(Math.random() * 10000);
+				socket.emit('newroom', {room_name: room_name, room_number:room_number});
+				$('.newRoom').val('');
+			}
+
+		});
+
+	});
+</script>
 </body>
 </html>

@@ -2,23 +2,23 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<title>ChatCAT</title>
+	<title>Chatroom {{room_name}}</title>
 	<link rel="stylesheet" href="../css/room.css">
-	<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+
 </head>
 <body>
 <div class="rm-container">
-		<h1 class="rm-title">ChatCAT</h1>
+		<h1 class="rm-title">{{room_name}}</h1>
 		<div class="rm-userbox">
-			<img style="width:50px" src="../images/profilepic.jpg" class="userPic">
-			<h3 class="userName">John Doe | <a href="#">Logout</a><a href="#">More Chatrooms</a></h3>
+			<img style="width:50px" src="{{user.profilePic}}" class="userPic">
+			<h3 class="userName">{{user.fullname}} | <a href="/logout">Logout</a><a href="/chatrooms">More Chatrooms</a></h3>
 		</div>
 		<div class="rm-roomname">
-			<h5>World Cuisine</h5>
+			<h5>{{room_name}}</h5>
 		</div>
 		<div class="rm-messages">
 			<ul class="messages">
-				<li>
+<!-- 				<li>
 					<div class="msgbox">
 						<div class="pic"><img style="width:50px" src="../images/profilepic.jpg">Sachin Bhatnagar</div>
 						<div class="msg"><p>Hi there this looks nice !</p></div>
@@ -29,7 +29,7 @@
 						<div class="pic"><img style="width:50px" src="../images/profilepic.jpg">Sachin Bhatnagar</div>
 						<div class="msg"><p>Hi there this looks nice !</p></div>
 					</div>
-				</li>
+				</li> -->
 			</ul>
 		</div>
 		<div class="rm-users">
@@ -42,5 +42,91 @@
 			
 		</div>
 	</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+<script>
+	$(function(){
+
+		var host = '{{config.host}}';
+		var messages = io.connect(host + '/messages');
+		var room_number = {{room_number}};
+		var user_name = '{{user.fullname}}';
+		var user_pic = '{{user.profilePic}}';
+
+		messages.on('connect', function(){
+			console.log('client : room-connect');
+			messages.emit('joinroom', {room_number:room_number, user_name: user_name, user_pic: user_pic});
+		});
+
+		messages.on('messagefeed', function(data){
+			console.log('client : new-message');
+
+			var new_message = JSON.parse(data);
+
+			updateMessageFeed(new_message.user_pic, new_message.user_name, new_message.message);
+
+		});
+
+		messages.on('updateuserlist', function(data){
+
+			$('.users').html('');
+
+			var users = JSON.parse(data);
+
+			var total_users = users.length;
+
+			for($i = 0; $i < total_users; $i++){
+
+				addUserToList(users[$i].user_pic, users[$i].user_name);
+
+			}
+
+		});
+
+		function addUserToList(user_pic, user_name){
+		
+			var str = '<li><img style="width:40px" src="'+user_pic+'"><h5>'+user_name+'</h5></li>';
+
+			$('.users').append(str);
+		}
+
+		$(document).on('keyup', '.newmessage', function(e){
+
+			if(e.which === 13 && $(this).val != ''){
+
+	
+				var message = $(this).val();
+
+				messages.emit('newmessage', {
+					room_number: room_number,
+					user_name: user_name,
+					user_pic: user_pic,
+					user_pic: user_pic,
+					message: message,
+				});
+
+				updateMessageFeed(user_pic, user_name, message);
+
+				$(this).val('');
+	
+			}
+
+		});
+
+		function updateMessageFeed(user_pic, user_name, message){
+
+			var new_message = '<li><div class="msgbox"><div class="pic"><img style="width:50px" src="' + user_pic + '"></div><div class="msg"><p>'+message+'</p></div></div></li>';
+
+			$('.messages').hide().append(new_message).slideDown(100);
+		}
+
+		setInterval(function(){
+			messages.emit('updatelist', {room_number: room_number});
+		}, 15000);
+
+
+
+	});
+	</script>
 </body>
 </html>

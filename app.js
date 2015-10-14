@@ -12,6 +12,12 @@ var mongoose            = require('mongoose').connect(config.dbUrl);
 var passport            = require('passport');
 var FacebookStrategy    = require('passport-facebook').Strategy;
 
+var http                = require('http');
+var server              = http.createServer(app);
+var io                  = require('socket.io').listen(server);
+
+var rooms               = [];
+
 app.set('views', path.join(__dirname, 'views'));
 app.engine('html', hogan);
 app.set('view engine', 'html');
@@ -36,10 +42,31 @@ if(env === 'development'){
 app.use(passport.initialize());
 app.use(passport.session());
 
-require('./routes/routes')(express, app, passport);
+require('./routes/routes')(express, app, passport, config, rooms);
 require('./auth/passportAuth')(passport, FacebookStrategy, config, mongoose);
 
-app.listen(port, function(){
-    console.log('listening on port: ' + 9000);
+
+app.set('port', process.env.PORT || port);
+
+require('./socket/socket')(io, rooms);
+
+server.listen(app.get('port'), function(){
+
+    console.log('listening on port: ' + app.get('port'));
     console.log('mode: ' + env)
-})
+
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
